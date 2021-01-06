@@ -1,17 +1,13 @@
+import React from 'react'
 import {
-    BrowserRouter as Router,
     Switch,
     Route,
     Link,
+    useLocation,
+    useRouteMatch,
 } from "react-router-dom";
-
-
-import React, { useState } from 'react';
-// import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Box from '@material-ui/core/Box';
+import { MenuItem, MenuList, Box } from "@material-ui/core";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -21,48 +17,36 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         height: 224,
     },
-    tabs: {
+    menuList: {
         borderRight: `1px solid ${theme.palette.divider}`,
     },
 }));
 
-export default function Example1({ match }) {
-    let { url } = match
-    const classes = useStyles();
-
-    const [value, setValue] = useState(0);
-
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
+function Example() {
+    let { path, url } = useRouteMatch()
+    let { pathname } = useLocation()
+    const classes = useStyles()
 
     return (
-        <Router basename={url}>
-            <div className={classes.root}>
-                <Tabs
-                    orientation="vertical"
-                    value={value}
-                    onChange={handleChange}
-                    aria-label="Vertical tabs example"
-                    className={classes.tabs}
-                    variant='standart'
-                >
-                    <Tab label={<Link to='/'>Home</Link>} />
-                    <Tab label={<Link to='/about'>About</Link>} />
-                    <Tab label={<Link to='/users'>Users</Link>} />
-                </Tabs>
-                <Box p={3}>
-                    <Switch>
-                        <Route path='/about'><About /></Route>
-                        <Route path='/users'><Users /></Route>
-                        <Route path='/'><Home /></Route>
-                    </Switch>
-                </Box>
-            </div>
-        </Router>
+        <div className={classes.root}>
+            <MenuList className={classes.menuList}>
+                <MenuItem component={Link} to={`${url}`} selected={`${url}` === pathname}>Home</MenuItem>
+                <MenuItem component={Link} to={`${url}/about`} selected={`${url}/about` === pathname}>About</MenuItem>
+                <MenuItem component={Link} to={`${url}/users`} selected={`${url}/users` === pathname}>Users</MenuItem>
+            </MenuList>
+            <Box p={3}>
+                <Switch>
+                    <Route path={`${path}/about`}><About /></Route>
+                    <Route path={`${path}/users`}><Users /></Route>
+                    <Route path={`${path}/`}><Home /></Route>
+                </Switch>
+            </Box>
+        </div>
     );
 }
 
 const Home = () => <h2>Home</h2>
 const About = () => <h2>About</h2>
 const Users = () => <h2>Users</h2>
+
+export default Example
