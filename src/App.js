@@ -15,21 +15,27 @@ const PAGES = [
   { title: 'modalg', path: '/modalg', content: 'Modal Gallery' },
 ]
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   navlinkText: {
     color: 'white'
   },
   navbar: {
     justifyContent: 'space-between'
+  },
+  appBar: {
+    zIndex: theme.zIndex.drawer + 1,
+  },
+  main: {
+    marginTop: 64
   }
-});
+}));
 
 export default function App(props) {
   const classes = useStyles();
   return (
     <>
-      <AppBar position='static'>
-        <Container fixed>
+      <AppBar position='fixed' className={classes.appBar}>
+        <Container fixed >
           <Toolbar className={classes.navbar}>
             {PAGES.map((page) => (
               <NavLink to={page.path} key={page.title}>
@@ -39,7 +45,7 @@ export default function App(props) {
           </Toolbar>
         </Container>
       </AppBar>
-      <main>
+      <main className={classes.main}>
         <Switch>
           <Route path='/' exact>Welcome to main page</Route>
           <Route path='/example' component={Example} />
