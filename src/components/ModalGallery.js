@@ -1,14 +1,35 @@
 import React from 'react';
+import HomeIcon from '@material-ui/icons/Home';
+import ImageIcon from '@material-ui/icons/Image';
+import PaletteIcon from '@material-ui/icons/Palette';
 import {
-    BrowserRouter as Router,
     Switch,
     Route,
     Link,
     useHistory,
     useLocation,
+    useRouteMatch,
     NavLink
 } from 'react-router-dom';
+import {
+    Box, Button, ButtonGroup, Container, Divider, GridList, GridListTile, List, ListItem,
+    ListItemIcon, ListItemText, makeStyles, Paper, Typography
+} from '@material-ui/core';
 
+const useStyles = makeStyles((theme) => ({
+    selected: {
+        backgroundColor: theme.palette.action.focus
+    },
+    paperLink: {
+        border: '1.5px #ccc solid',
+        display: 'flex',
+        textAlign: 'center',
+        flexDirection: 'reverse',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingTop: '10px',
+    }
+}))
 
 const IMAGES = [
     { id: 0, title: 'Dark Orchid', color: 'DarkOrchid' },
@@ -18,24 +39,31 @@ const IMAGES = [
     { id: 4, title: 'Crimson', color: 'Crimson' }
 ];
 
-export default function E({ match, ...props }) {
-    let { url } = match
-    return (<Router basename={url}><ModalSwitch /></Router>)
-}
-function ModalSwitch() {
+
+export default function ModalSwitch() {
+    let { path, url } = useRouteMatch()
+    const classes = useStyles()
     let location = useLocation();
+    let { pathname } = location
     let background = location.state && location.state.background
     return (
-        <>
-            <NavLink to='/'>Home</NavLink>
-            <Switch location={background || location}>
-                <Route exact path='/' component={Home} />
-                <Route path='/gallery' component={Gallery} />
-                <Route path='/img/:id' component={ImageView} />
-            </Switch>
+        <Container maxWidth="lg">
+            <Box p={3}>
+                <ButtonGroup variant='text'>
+                    <Button className={pathname === `${url}` ? classes.selected : ''} startIcon={<HomeIcon />} component={NavLink} to={`${url}`}>Home</Button>
+                    <Button className={pathname === `${url}/gallery` ? classes.selected : ''} startIcon={<ImageIcon />} component={NavLink} to={`${url}/gallery`}>Visit the Gallery</Button>
+                </ButtonGroup>
+                <Divider variant='middle' style={{ margin: '20px 0' }} />
+                <Switch location={background || location}>
+                    <Route exact path={`${path}`} component={Home} />
+                    <Route path={`${path}/gallery`} ><Gallery baseUrl={url} /></Route>
+                    <Route path={`${path}/img/:id`} component={ImageView} />
+                </Switch>
 
-            {background && <Route path={`/img/:id`} component={Modal} />}
-        </>
+                {background && <Route path={`${path}/img/:id`} component={Modal} />}
+
+            </Box>
+        </Container>
     );
 }
 
@@ -43,8 +71,8 @@ function Thumbnail({ color }) {
     return (
         <div
             style={{
-                width: 50,
-                height: 50,
+                width: 150,
+                height: 150,
                 background: color
             }}
         />
@@ -57,7 +85,8 @@ function Image({ color }) {
             style={{
                 width: '100%',
                 height: 400,
-                background: color
+                background: color,
+                margin: '0 auto'
             }}
         />
     );
@@ -65,35 +94,53 @@ function Image({ color }) {
 
 function Home() {
     return (
-        <div>
-            <Link to={`/gallery`}>Visit the Gallery</Link>
-            <h2>Featured Images</h2>
-            <ul>
-                <li><Link to='/img/2'>Tomato</Link></li>
-                <li><Link to='/img/4'>Crimson</Link></li>
-            </ul>
-        </div>
+        <>
+            <Typography variant='h4'>Featured Images</Typography>
+            <div style={{ width: '20%' }}>
+                <List>
+                    <ListItem button to='/modalg/img/2' component={Link}>
+                        <ListItemIcon>
+                            <PaletteIcon style={{ color: 'Tomato' }} />
+                        </ListItemIcon>
+                        <ListItemText primary="Tomato" />
+                    </ListItem>
+                    <ListItem button to='/modalg/img/4' component={Link}>
+                        <ListItemIcon>
+                            <PaletteIcon style={{ color: 'Crimson' }} />
+                        </ListItemIcon>
+                        <ListItemText primary="Crimson" />
+                    </ListItem>
+                </List>
+            </div>
+        </>
     );
 }
 
-function Gallery({ ...props }) {
-    let location = useLocation();
+function Gallery({ baseUrl }) {
+    const classes = useStyles()
+    const location = useLocation();
     return (
         <div>
-            {IMAGES.map(i => (
-                <Link
-                    key={i.id}
-                    to={{
-                        pathname: `/img/${i.id}`,
-                        // This is the trick! This link sets
-                        // the `background` in location state.
-                        state: { background: location }
-                    }}
-                >
-                    <Thumbnail color={i.color} />
-                    <p>{i.title}</p>
-                </Link>
-            ))}
+            <GridList cellHeight={200} cols={5} spacing={30}>
+                {IMAGES.map(image => (
+                    <GridListTile key={image.id} cols={image.cols || 1}>
+                        <Paper variant="outlined" className={classes.paperLink}>
+                            <Link
+                                to={{
+                                    pathname: `${baseUrl}/img/${image.id}`,
+                                    state: { background: location }
+                                }}
+                            >
+                                <Thumbnail color={image.color} />
+                                <div style={{display: 'flex', justifyContent: 'center'}}>
+                                <PaletteIcon style={{ color: image.color, paddingRight: '5px' }}/>
+                                <Typography gutterBottom variant='subtitle1' color='textPrimary'>{image.title}</Typography>
+                                </div>
+                            </Link>
+                        </Paper>
+                    </GridListTile>
+                ))}
+            </GridList>
         </div>
     );
 }
@@ -141,16 +188,16 @@ function Modal({ match }) {
                 style={{
                     position: 'absolute',
                     background: '#fff',
-                    top: 25,
+                    top: 80,
                     left: '10%',
                     right: '10%',
                     padding: 15,
                     border: '2px solid #444'
                 }}
             >
-                <h1>{image.title}</h1>
+                <Typography gutterBottom variant='h3'>Name: {image.title}</Typography>
                 <Image color={image.color} />
-                <button type='button' onClick={back}>Close</button>
+                <Button variant='outlined' color='secondary' style={{ marginTop: '5px', border: '1.9px solid' }} onClick={back}>Close</Button>
             </div>
         </div>
     );

@@ -24,7 +24,7 @@ export default function Example() {
                 <Button variant='outlined' startIcon={<HomeIcon />} onClick={handleClick}>Home</Button>
                 <Divider variant='middle' style={{ margin: '20px 0' }} />
                 <Switch>
-                    <Route exact path={`${url}`}>
+                    <Route exact path={`${path}`}>
                         <Typography gutterBottom variant='h4'>Main page</Typography>
                         <ButtonGroup variant="text">
                             <Button component={Link} to={`${url}/blog/2`}>FAQs</Button>
@@ -41,7 +41,6 @@ export default function Example() {
 
 function BlogPost({ match, baseUrl, ...props }) {
     let { pathname } = useLocation()
-    console.log('12345' - '12');
     let { slug } = match.params;
     let disabled = pathname === `${baseUrl}/blog/2` ? true : false
     let buttonProps = {

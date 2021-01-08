@@ -38,7 +38,6 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'space-around',
         overflow: 'hidden'
     }
-
 }))
 
 export default function MatchParams() {
