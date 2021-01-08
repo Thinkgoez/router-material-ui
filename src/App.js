@@ -1,5 +1,5 @@
 import { NavLink, Route, Switch } from 'react-router-dom';
-import { AppBar, Button, Container, makeStyles, Toolbar } from '@material-ui/core';
+import { AppBar, Button, Container, makeStyles, Toolbar, Typography } from '@material-ui/core';
 import './App.css'
 
 import SimpleRouting from './components/SimpleRouting';
@@ -46,8 +46,9 @@ export default function App(props) {
         </Container>
       </AppBar>
       <main className={classes.main}>
+
         <Switch>
-          <Route path='/' exact>Welcome to main page</Route>
+          <Route path='/' exact><Typography variant='h4' align='center' style={{paddingTop: '20px'}}>Welcome to main page</Typography></Route>
           <Route path='/example' component={Example} />
           <Route path='/matchparams' component={MatchParams} />
           <Route path='/routing' component={SimpleRouting} />
